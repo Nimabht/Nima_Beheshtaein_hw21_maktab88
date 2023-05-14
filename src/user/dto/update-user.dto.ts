@@ -6,7 +6,6 @@ export class UpdateUserDto {
   email: string;
 
   @IsOptional()
-  @IsNotEmpty()
   @IsString()
   fullname: string;
 }

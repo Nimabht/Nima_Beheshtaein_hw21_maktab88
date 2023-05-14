@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
+import { Ticket } from 'src/ticket/entities/ticket.entity';
 
 @Entity()
 export class User {
@@ -25,6 +26,9 @@ export class User {
   @Column({ nullable: false })
   @IsNotEmpty()
   role: string;
+
+  @OneToMany(() => Ticket, (ticket) => ticket.user)
+  tickets: Ticket[];
 
   async hashPassword(): Promise<void> {
     const salt = await bcrypt.genSalt();

@@ -6,6 +6,7 @@ import { User } from './user/entities/user.entity';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { TicketModule } from './ticket/ticket.module';
 
 @Module({
   imports: [
@@ -22,9 +23,11 @@ import { AuthModule } from './auth/auth.module';
       database: process.env.DATABASE_NAME,
       entities: [User],
       synchronize: false,
+      autoLoadEntities: true,
     }),
     UserModule,
     AuthModule,
+    TicketModule,
   ],
   controllers: [AppController],
   providers: [AppService],
