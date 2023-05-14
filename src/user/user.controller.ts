@@ -18,16 +18,16 @@ import { ResponseUserDto } from './dto/response-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    if (createUserDto.password !== createUserDto.repeatPassword) {
-      throw new BadRequestException("Passwords doesn't match.");
-    }
-    if (!!this.userService.findByEmail(createUserDto.email)) {
-      throw new BadRequestException('Try another email.');
-    }
-    return this.userService.create(createUserDto);
-  }
+  // @Post()
+  // create(@Body() createUserDto: CreateUserDto) {
+  //   if (createUserDto.password !== createUserDto.repeatPassword) {
+  //     throw new BadRequestException("Passwords doesn't match.");
+  //   }
+  //   if (!!this.userService.findByEmail(createUserDto.email)) {
+  //     throw new BadRequestException('Try another email.');
+  //   }
+  //   return this.userService.create(createUserDto);
+  // }
 
   @Get()
   async findAll() {
