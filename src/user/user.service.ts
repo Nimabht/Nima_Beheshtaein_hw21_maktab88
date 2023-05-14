@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -37,6 +37,9 @@ export class UserService implements OnModuleInit {
     return this.userRepository.findOneBy({ id });
   }
 
+  findByEmail(email: string): Promise<User> {
+    return this.userRepository.findOneBy({ email });
+  }
   update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     this.userRepository.update(id, updateUserDto);
     return this.userRepository.findOneBy({ id });
