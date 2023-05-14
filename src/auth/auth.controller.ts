@@ -22,8 +22,6 @@ export class AuthController {
     if (createUserDto.password !== createUserDto.repeatPassword) {
       throw new BadRequestException("Passwords doesn't match.");
     }
-    console.log(this.userService.findByEmail(createUserDto.email));
-
     if (!!(await this.userService.findByEmail(createUserDto.email))) {
       throw new BadRequestException('Try another email.');
     }
