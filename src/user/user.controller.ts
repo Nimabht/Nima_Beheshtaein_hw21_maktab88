@@ -9,6 +9,8 @@ import {
   ParseIntPipe,
   BadRequestException,
   UseGuards,
+  Request,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -33,14 +35,22 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Get()
-  async findAll() {
+  async findAll(@Request() req) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException();
+    }
     const users = await this.userService.findAll();
     return users.map((user) => new ResponseUserDto(user));
   }
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Request() req, @Param('id', ParseIntPipe) id: number) {
+    if (req.user.role !== 'admin') {
+      if (req.user.id !== id) {
+        throw new ForbiddenException();
+      }
+    }
     const user = await this.userService.findOne(+id);
     return new ResponseUserDto(user);
   }
@@ -48,15 +58,26 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Patch(':id')
   update(
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
+    if (req.user.role !== 'admin') {
+      if (req.user.id !== id) {
+        throw new ForbiddenException();
+      }
+    }
     return this.userService.update(id, updateUserDto);
   }
 
   @UseGuards(AuthGuard)
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Request() req, @Param('id', ParseIntPipe) id: number) {
+    if (req.user.role !== 'admin') {
+      if (req.user.id !== id) {
+        throw new ForbiddenException();
+      }
+    }
     return this.userService.remove(id);
   }
 }
