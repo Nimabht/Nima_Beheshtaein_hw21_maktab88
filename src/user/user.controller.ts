@@ -7,10 +7,12 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ResponseUserDto } from './dto/response-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -18,17 +20,25 @@ export class UserController {
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
+    if (createUserDto.password !== createUserDto.repeatPassword) {
+      throw new BadRequestException("Passwords doesn't match.");
+    }
+    if (!!this.userService.findByEmail(createUserDto.email)) {
+      throw new BadRequestException('Try another email.');
+    }
     return this.userService.create(createUserDto);
   }
 
   @Get()
   async findAll() {
-    return await this.userService.findAll();
+    const users = await this.userService.findAll();
+    return users.map((user) => new ResponseUserDto(user));
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.userService.findOne(+id);
+    return new ResponseUserDto(user);
   }
 
   @Patch(':id')
