@@ -27,6 +27,7 @@ export class TicketController {
   @UseGuards(AuthGuard)
   @Get()
   async findAll(@Request() req) {
+    console.log(req.user);
     if (req.user.role !== 'admin') {
       throw new ForbiddenException();
     }

@@ -67,6 +67,8 @@ export class UserController {
         throw new ForbiddenException();
       }
     }
+
+    if (Object.keys(updateUserDto).length == 0) return null;
     return this.userService.update(id, updateUserDto);
   }
 

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ticket List</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Ticket List</h1>
+      <div id="ticketList"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cookie@0.4.1/dist/cookie.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Get JWT token from cookie
+        const token = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('jwt='))
+          .split('=')[1];
+
+        // Function to retrieve ticket data
+        function getTicketData() {
+          $.ajax({
+            url: '/ticket',
+            type: 'GET',
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            },
+            success: function (response) {
+              renderTickets(response);
+            },
+            error: function (xhr, status, error) {
+              console.error(error);
+            },
+          });
+        }
+
+        // Function to render ticket data
+        function renderTickets(tickets) {
+          const ticketList = $('#ticketList');
+
+          // Clear existing content
+          ticketList.empty();
+
+          // Render each ticket
+          tickets.forEach((ticket) => {
+            const card = $('<div class="card">');
+            const cardBody = $('<div class="card-body">');
+
+            // Ticket title
+            const title = $('<h5 class="card-title">').text(ticket.title);
+            cardBody.append(title);
+
+            // Ticket message
+            const message = $('<p class="card-text">').text(ticket.message);
+            cardBody.append(message);
+
+            // Ticket status
+            const status = $('<p class="card-text">');
+            if (ticket.answer) {
+              status.text('Status: Answered ✅');
+            } else {
+              status.text('Status: Not Answered ❌');
+            }
+            cardBody.append(status);
+
+            // Answer button
+            const answerButton = $(
+              '<a class="btn btn-primary" href="/answer-ticket/' +
+                ticket.id +
+                '">',
+            ).text('Answer');
+            cardBody.append(answerButton);
+
+            card.append(cardBody);
+            ticketList.append(card);
+          });
+        }
+
+        // Get the initial ticket data
+        getTicketData();
+      });
+    </script>
+  </body>
+</html>

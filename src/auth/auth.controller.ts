@@ -8,12 +8,15 @@ import {
   UseGuards,
   Get,
   Request,
+  UnauthorizedException,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UserService } from 'src/user/user.service';
 import { AuthGuard } from './auth.guard';
 import { SigninUserDto } from './dto/signin-auth.dto';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -35,13 +38,17 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() signInDto: SigninUserDto) {
-    return this.authService.signIn(signInDto.email, signInDto.password);
-  }
+  async signIn(@Body() signInDto: SigninUserDto, @Res() res: Response) {
+    const user = await this.userService.findByEmail(signInDto.email);
+    if (!(await user.validatePassword(signInDto.password))) {
+      throw new UnauthorizedException('Email or password is incorrect!');
+    }
+    const token = await this.authService.signIn(user);
 
-  @UseGuards(AuthGuard)
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
+    res.cookie('jwt', token, {
+      httpOnly: false,
+      // Other options as needed (e.g., secure, sameSite)
+    });
+    return res.status(HttpStatus.OK).send({ message: 'Login successful' });
   }
 }

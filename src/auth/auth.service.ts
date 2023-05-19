@@ -1,6 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { User } from 'src/user/entities/user.entity';
+import * as jwt from 'jsonwebtoken';
+import { jwtConstants } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -9,14 +12,18 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(email: string, pass: string): Promise<any> {
-    const user = await this.usersService.findByEmail(email);
-    if (!(await user.validatePassword(pass))) {
-      throw new UnauthorizedException();
-    }
+  async signIn(user: User): Promise<any> {
     const payload = { id: user.id, role: user.role };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+    const token = await this.jwtService.signAsync(payload);
+    return token;
+  }
+
+  verifyToken(token: string): any {
+    try {
+      const decodedToken = jwt.verify(token, jwtConstants.secret);
+      return decodedToken;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }

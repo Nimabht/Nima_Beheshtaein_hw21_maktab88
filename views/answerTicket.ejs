@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Ticket Answer</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Admin Ticket Answer</h1>
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title" id="ticketTitle">title: <%= title %></h5>
+          <p class="card-text" id="ticketMessage">message: <%= message %></p>
+          <span>Ticket id: </span>
+          <input class="card-text btn w-1 p-0" id="ticketId" value="<%= id %>" readonly></input>
+        </div>
+      </div>
+
+      <form id="answerForm">
+        <div class="form-group mt-3">
+          <label for="answer">Answer</label>
+          <textarea
+            class="form-control"
+            id="answer"
+            rows="5"
+            required
+          ><%= answer %></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+      const ticketId = $('#ticketId').val();
+      $(document).ready(function () {
+        // Function to handle form submission
+        $('#answerForm').submit(function (event) {
+          event.preventDefault();
+
+          const answer = $('#answer').val();
+
+          const data = {
+            answer: answer,
+          };
+          const token = getCookie('jwt');
+          $.ajax({
+            url: `/ticket/${ticketId}`,
+            type: 'PATCH',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            },
+            success: function (response) {
+              alert('Answer submitted successfully');
+              // Clear answer field
+              $('#answer').val('');
+            },
+            error: function (xhr, status, error) {
+              console.error(error);
+            },
+          });
+        });
+
+        // Function to get the value of a cookie by name
+        function getCookie(name) {
+          const value = '; ' + document.cookie;
+          const parts = value.split('; ' + name + '=');
+          if (parts.length === 2) {
+            return parts.pop().split(';').shift();
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
