@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>User List</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>User List</h1>
+      <ul id="userList" class="list-group"></ul>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cookie@0.4.1/dist/cookie.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Get JWT token from cookie
+        const token = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('jwt='))
+          .split('=')[1];
+
+        // Function to retrieve user data
+        function getUserData() {
+          $.ajax({
+            url: '/user',
+            type: 'GET',
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            },
+            success: function (response) {
+              renderUsers(response);
+            },
+            error: function (xhr, status, error) {
+              console.error(error);
+            },
+          });
+        }
+
+        // Function to render user data
+        function renderUsers(users) {
+          const userList = $('#userList');
+
+          // Clear existing content
+          userList.empty();
+
+          // Render each user
+          users.forEach((user) => {
+            const listItem = $('<li class="list-group-item">');
+
+            // User ID
+            const id = $('<p>').text('ID: ' + user.id);
+            listItem.append(id);
+
+            // User Email
+            const email = $('<p>').text('Email: ' + user.email);
+            listItem.append(email);
+
+            // User Fullname
+            const fullname = $('<p>').text('Fullname: ' + user.fullname);
+            listItem.append(fullname);
+
+            // User Role
+            const role = $('<p>').text('Role: ' + user.role);
+            listItem.append(role);
+
+            userList.append(listItem);
+          });
+        }
+
+        // Get the initial user data
+        getUserData();
+      });
+    </script>
+  </body>
+</html>

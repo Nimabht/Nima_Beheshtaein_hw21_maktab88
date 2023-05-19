@@ -96,4 +96,16 @@ export class AppController {
     }
     return {};
   }
+
+  @Render('allUsers')
+  @Get('all-users')
+  async getAllUsersPage(@Request() req: eRequest) {
+    const jwtCookie = req.cookies.jwt;
+    const decodedToken = this.authService.verifyToken(jwtCookie);
+
+    if (decodedToken.role !== 'admin') {
+      throw new ForbiddenException('Forbidden');
+    }
+    return {};
+  }
 }
