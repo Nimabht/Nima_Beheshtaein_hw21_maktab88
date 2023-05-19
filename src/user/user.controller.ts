@@ -82,4 +82,23 @@ export class UserController {
     }
     return this.userService.remove(id);
   }
+
+  @UseGuards(AuthGuard)
+  @Patch('/reset-password/:id')
+  async resetPassword(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
+    @Body('newPassword') newPassword: string,
+  ) {
+    if (req.user.id !== id) {
+      throw new ForbiddenException();
+    }
+
+    if (!newPassword) {
+      throw new BadRequestException('New password is required');
+    }
+
+    await this.userService.resetPassword(id, newPassword);
+    return { message: 'Password reset successful' };
+  }
 }

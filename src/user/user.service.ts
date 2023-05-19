@@ -49,6 +49,17 @@ export class UserService implements OnModuleInit {
     this.userRepository.delete(id);
   }
 
+  async resetPassword(id: number, newPassword: string): Promise<void> {
+    const user = await this.userRepository.findOneBy({ id });
+
+    // Hash the new password
+    const hashedPassword = await hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    // Save the updated user
+    await this.userRepository.save(user);
+  }
+
   private async createInitialAdminUser() {
     const adminUser = await this.userRepository.findOneBy({ role: 'admin' });
 
