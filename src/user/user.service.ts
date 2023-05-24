@@ -40,6 +40,7 @@ export class UserService implements OnModuleInit {
   findByEmail(email: string): Promise<User> {
     return this.userRepository.findOneBy({ email });
   }
+
   update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     this.userRepository.update(id, updateUserDto);
     return this.userRepository.findOneBy({ id });
