@@ -40,6 +40,10 @@ export class AuthController {
   @Post('login')
   async signIn(@Body() signInDto: SigninUserDto, @Res() res: Response) {
     const user = await this.userService.findByEmail(signInDto.email);
+    if (!user) {
+      throw new UnauthorizedException('Email or password is incorrect!');
+    }
+
     if (!(await user.validatePassword(signInDto.password))) {
       throw new UnauthorizedException('Email or password is incorrect!');
     }
